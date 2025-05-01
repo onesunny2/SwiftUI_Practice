@@ -6,13 +6,8 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		43390F232DC35DAC008018C5 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 43390F222DC35DAC008018C5 /* .gitignore */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXFileReference section */
 		43390DAA2DC358DB008018C5 /* StateSynchronization.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StateSynchronization.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		43390F222DC35DAC008018C5 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -37,7 +32,6 @@
 		43390DA12DC358DB008018C5 = {
 			isa = PBXGroup;
 			children = (
-				43390F222DC35DAC008018C5 /* .gitignore */,
 				43390DAC2DC358DB008018C5 /* StateSynchronization */,
 				43390DAB2DC358DB008018C5 /* Products */,
 			);
@@ -115,7 +109,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				43390F232DC35DAC008018C5 /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
