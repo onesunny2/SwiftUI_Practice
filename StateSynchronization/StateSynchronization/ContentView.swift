@@ -86,4 +86,5 @@ extension ContentView {
 
 #Preview {
     ContentView()
+        .environmentObject(SaveDownloadManager())
 }

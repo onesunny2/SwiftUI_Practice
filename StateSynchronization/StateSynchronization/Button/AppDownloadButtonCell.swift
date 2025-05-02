@@ -39,6 +39,11 @@ struct AppDownloadButtonCell: View {
     
     var body: some View {
         appButton()
+            .onAppear {
+                if status == .다운로드_중 {
+                    startTimer()
+                }
+            }
 //        if #available(iOS 17, *) {
 //            appButton()
 //                .onChange(of: scenePhase) { oldValue, newValue in

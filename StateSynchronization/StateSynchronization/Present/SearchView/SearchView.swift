@@ -14,7 +14,14 @@ struct SearchView: View {
     
     var body: some View {
         ForEach(appIds, id: \.self) { id in
-            listCell(id: id, manager: manager)
+            NavigationLink {
+                SearchDetailView(id: id)
+            } label: {
+                listCell(id: id)
+                    .padding(.horizontal, 20)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(PlainButtonStyle())
         }
     }
 }
@@ -22,11 +29,12 @@ struct SearchView: View {
 struct listCell: View {
     
     let id: Int
-    @ObservedObject var manager: SaveDownloadManager
+    @EnvironmentObject var manager: SaveDownloadManager
     
     var body: some View {
         HStack {
             Text("\(id)")
+            Spacer()
             AppDownloadButtonCell(id: id, manager: manager)
         }
     }
