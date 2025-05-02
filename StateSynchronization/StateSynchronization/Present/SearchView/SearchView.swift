@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct SearchView: View {
-    
-    @EnvironmentObject private var manager: SaveDownloadManager
-    let appIds = [1,2,3,4,5]
+    let appIds = [6,7,8,9,10]
     
     var body: some View {
         ForEach(appIds, id: \.self) { id in
@@ -35,7 +33,7 @@ struct listCell: View {
         HStack {
             Text("\(id)")
             Spacer()
-            AppDownloadButtonCell(id: id, manager: manager)
+            AppDownloadButtonCell(manager: manager, id: id)
         }
     }
 }

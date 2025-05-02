@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 struct AppInfo: Codable {
     let id: Int
@@ -28,6 +29,7 @@ extension Int {
 final class SaveDownloadManager: ObservableObject {
     
     @Published var statusById: [Int: AppInfo] = [:]
+    var timers: [Int: AnyCancellable] = [:]
     
     init() {
         loadAllInfo()
@@ -47,6 +49,11 @@ final class SaveDownloadManager: ObservableObject {
             do {
                 let info = try Coders.decoder.decode(AppInfo.self, from: data)
                 statusById[id] = info
+                
+                if info.status == .다운로드_중 {
+                    
+                }
+                
             } catch {
                 print("\(id) 정보 불러오기 실패: \(error)")
             }
@@ -75,16 +82,66 @@ final class SaveDownloadManager: ObservableObject {
         }
     }
     
-//    func loadInfo(for id: Int) -> AppInfo? {
-//        
-//        guard let data = UserDefaults.standard.data(forKey: id.forKey()) else { return nil }
-//        
-//        do {
-//            let info = try Coders.decoder.decode(AppInfo.self, from: data)
-//            return info
-//        } catch {
-//            print("userdefault 불러오기 실패: \(error)")
-//            return nil
-//        }
-//    }
+    func startTimer(for id: Int) {
+        // 기존 타이머 취소
+        timers[id]?.cancel()
+        
+        // 타이머 생성
+        timers[id] = Timer.publish(every: 0.1, on: .current, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self,
+                      let info = self.statusById[id] else { return }
+                
+                if info.count >= 10.0 {
+                    // 다운로드 완료
+                    self.saveInfo(
+                        id: id,
+                        status: .열기,
+                        count: 0.0,
+                        date: Date()
+                    )
+                    self.pauseTimer(for: id, saveStatus: false)
+                } else {
+                    // 진행 중
+                    self.saveInfo(
+                        id: id,
+                        status: .다운로드_중,
+                        count: info.count + 0.1,
+                        date: Date()
+                    )
+                }
+            }
+    }
+    
+    func pauseTimer(for id: Int, saveStatus: Bool = true) {
+        if saveStatus {
+            // 상태를 재개(또는 다시받기)로 변경
+            if let info = statusById[id] {
+                saveInfo(
+                    id: id,
+                    status: .재개,
+                    count: info.count,
+                    date: Date()
+                )
+            }
+        }
+        
+        // 타이머 취소
+        timers[id]?.cancel()
+        timers[id] = nil
+    }
+    
+    //    func loadInfo(for id: Int) -> AppInfo? {
+    //
+    //        guard let data = UserDefaults.standard.data(forKey: id.forKey()) else { return nil }
+    //
+    //        do {
+    //            let info = try Coders.decoder.decode(AppInfo.self, from: data)
+    //            return info
+    //        } catch {
+    //            print("userdefault 불러오기 실패: \(error)")
+    //            return nil
+    //        }
+    //    }
 }

@@ -14,34 +14,24 @@ struct AppDownloadButtonCell: View {
     @ObservedObject var manager: SaveDownloadManager
     let id: Int
     
-    @State private var status: DownLoad
-    @State private var count: CGFloat
-    @State private var timerCancellable: AnyCancellable?
     private var progressRate: CGFloat {
-        get {
-            return CGFloat(count / 10.0)
-        }
+        guard let info = manager.statusById[id] else { return 0}
+        return CGFloat(info.count / 10.0)
     }
     
-    init(id: Int, manager: SaveDownloadManager) {
-        self.id = id
-        self.manager = manager
-        
-        guard let info = manager.statusById[id] else {
-            _status = State(initialValue: .받기)
-            _count = State(initialValue: 0.0)
-            return
-        }
-        
-        _status = State(initialValue: info.status)
-        _count = State(initialValue: info.count)
+    private var count: CGFloat {
+        return manager.statusById[id]?.count ?? 0.0
+    }
+    
+    private var status: DownLoad {
+        return manager.statusById[id]?.status ?? .받기
     }
     
     var body: some View {
         appButton()
             .onAppear {
                 if status == .다운로드_중 {
-                    startTimer()
+                    manager.startTimer(for: id)
                 }
             }
 //        if #available(iOS 17, *) {
@@ -63,19 +53,19 @@ struct AppDownloadButtonCell: View {
                 switch status {
                 case .받기:
                     updateStatus(new: .다운로드_중)
-                    startTimer()
+                    manager.startTimer(for: id)
                 case .열기:
                     break
                 case .재개:
                     updateStatus(new: .다운로드_중)
-                    startTimer()
+                    manager.startTimer(for: id)
                 case .다운로드_중:
                     if progressRate != 1.0 {
-                        pauseTimer()
+                        manager.pauseTimer(for: id)
                     }
                 case .다시받기:
                     updateStatus(new: .다운로드_중)
-                    startTimer()
+                    manager.startTimer(for: id)
                 }
             }
         } label: {
@@ -149,35 +139,7 @@ struct AppDownloadButtonCell: View {
         .clipShape(.rect(cornerRadius: 40))
     }
     
-    private func startTimer() {
-        timerCancellable?.cancel()
-        
-        timerCancellable = Timer.publish(every: 0.1, on: .current, in: .common)
-            .autoconnect()
-            .sink { _ in
-                guard count < 10.0 else {
-                    updateStatus(new: .열기)
-                    timerCancellable?.cancel()
-                    timerCancellable = nil
-                    updateCount(new: 0.0)
-                    return
-                }
-                
-                updateCount(new: count + 0.1)
-            }
-    }
-    
-    private func pauseTimer(saveStatus: Bool = true) {
-        if saveStatus {
-            updateStatus(new: .재개)
-        }
-        
-        timerCancellable?.cancel()
-        timerCancellable = nil
-    }
-    
     private func updateStatus(new status: DownLoad) {
-        self.status = status
         manager.saveInfo(
             id: id,
             status: status,
@@ -187,7 +149,6 @@ struct AppDownloadButtonCell: View {
     }
     
     private func updateCount(new count: CGFloat) {
-        self.count = count
         manager.saveInfo(
             id: id,
             status: status,
