@@ -29,6 +29,10 @@ final class SaveDownloadManager: ObservableObject {
     
     @Published var statusById: [Int: AppInfo] = [:]
     
+    init() {
+        loadAllInfo()
+    }
+    
     func loadAllInfo() {
         
         let allKeys = UserDefaults.standard.dictionaryRepresentation().keys

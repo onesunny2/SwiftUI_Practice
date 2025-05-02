@@ -10,13 +10,31 @@ import Combine
 
 struct AppDownloadButtonCell: View {
 //    @Environment(\.scenePhase) private var scenePhase
-    @State private var status: DownLoad = .받기
-    @State private var count: CGFloat = 0.0
+    
+    @ObservedObject var manager: SaveDownloadManager
+    let id: Int
+    
+    @State private var status: DownLoad
+    @State private var count: CGFloat
     @State private var timerCancellable: AnyCancellable?
     private var progressRate: CGFloat {
         get {
-            return CGFloat(count / 30.0)
+            return CGFloat(count / 10.0)
         }
+    }
+    
+    init(id: Int, manager: SaveDownloadManager) {
+        self.id = id
+        self.manager = manager
+        
+        guard let info = manager.statusById[id] else {
+            _status = State(initialValue: .받기)
+            _count = State(initialValue: 0.0)
+            return
+        }
+        
+        _status = State(initialValue: info.status)
+        _count = State(initialValue: info.count)
     }
     
     var body: some View {
@@ -39,18 +57,20 @@ struct AppDownloadButtonCell: View {
             withAnimation(.interactiveSpring(duration: 0.3)) {
                 switch status {
                 case .받기:
-                    status = .다운로드_중
+                    updateStatus(new: .다운로드_중)
                     startTimer()
                 case .열기:
                     break
                 case .재개:
-                    status = .다운로드_중
+                    updateStatus(new: .다운로드_중)
+                    startTimer()
                 case .다운로드_중:
                     if progressRate != 1.0 {
-                        status = .재개
+                        pauseTimer()
                     }
                 case .다시받기:
-                    status = .다운로드_중
+                    updateStatus(new: .다운로드_중)
+                    startTimer()
                 }
             }
         } label: {
@@ -130,16 +150,45 @@ struct AppDownloadButtonCell: View {
         timerCancellable = Timer.publish(every: 0.1, on: .current, in: .common)
             .autoconnect()
             .sink { _ in
-                guard count < 30.0 else {
-                    status = .열기
+                guard count < 10.0 else {
+                    updateStatus(new: .열기)
                     timerCancellable?.cancel()
                     timerCancellable = nil
-                    count = 0.0
+                    updateCount(new: 0.0)
                     return
                 }
                 
-                count += 0.1
+                updateCount(new: count + 0.1)
             }
+    }
+    
+    private func pauseTimer(saveStatus: Bool = true) {
+        if saveStatus {
+            updateStatus(new: .재개)
+        }
+        
+        timerCancellable?.cancel()
+        timerCancellable = nil
+    }
+    
+    private func updateStatus(new status: DownLoad) {
+        self.status = status
+        manager.saveInfo(
+            id: id,
+            status: status,
+            count: count,
+            date: Date()
+        )
+    }
+    
+    private func updateCount(new count: CGFloat) {
+        self.count = count
+        manager.saveInfo(
+            id: id,
+            status: status,
+            count: count,
+            date: Date()
+        )
     }
 }
 
@@ -157,6 +206,6 @@ extension AppDownloadButtonCell {
     }
 }
 
-#Preview {
-    AppDownloadButtonCell()
-}
+//#Preview {
+//    AppDownloadButtonCell(status: .받기)
+//}

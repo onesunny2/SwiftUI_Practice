@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct StateSynchronizationApp: App {
+    
+    @StateObject private var saveDownloadManager = SaveDownloadManager()
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(saveDownloadManager)
         }
     }
 }
