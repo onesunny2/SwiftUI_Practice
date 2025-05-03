@@ -30,7 +30,7 @@ struct listCell: View {
     @EnvironmentObject var manager: SaveDownloadManager
     
     var body: some View {
-        HStack {
+        HStack {  
             Text("\(id)")
             Spacer()
             AppDownloadButtonCell(manager: manager, id: id)
