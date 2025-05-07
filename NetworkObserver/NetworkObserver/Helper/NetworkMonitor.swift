@@ -14,7 +14,8 @@ extension EnvironmentValues {
 }
 
 
-class NetworkMonitor: ObservableObject {
+final class NetworkMonitor: ObservableObject {
+    
     @Published private(set) var isConnected: Bool?
     @Published private(set) var connectionType: NWInterface.InterfaceType?
     
@@ -27,8 +28,6 @@ class NetworkMonitor: ObservableObject {
     }
     
     private func startMonitoring() {
-        
-        monitor.start(queue: queue)
         
         monitor.pathUpdateHandler = { path in
             Task {
@@ -45,7 +44,7 @@ class NetworkMonitor: ObservableObject {
             }
         }
         
-//        monitor.start(queue: queue)  // 앞에 두나 여기 두나 큰 차이 없음
+        monitor.start(queue: queue)
     }
     
     func stopMonitoring() {
@@ -54,6 +53,7 @@ class NetworkMonitor: ObservableObject {
     
     func restartMonitoring() {
         stopMonitoring()
+        monitor = NWPathMonitor()
         startMonitoring()
     }
 }
