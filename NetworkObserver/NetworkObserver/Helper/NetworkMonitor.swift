@@ -13,7 +13,6 @@ extension EnvironmentValues {
     @Entry var connetionType: NWInterface.InterfaceType?
 }
 
-
 final class NetworkMonitor: ObservableObject {
     
     @Published private(set) var isConnected: Bool?
