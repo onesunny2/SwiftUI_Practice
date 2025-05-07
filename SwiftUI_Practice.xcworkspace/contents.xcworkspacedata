@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:LoginInlineToast/LoginInlineToast.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:NetworkObserver/NetworkObserver.xcodeproj">
    </FileRef>
    <FileRef
