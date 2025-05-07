@@ -25,6 +25,10 @@ struct ContentView: View {
                     }
                 }
             }
+            
+            NavigationLink("next View", destination: {
+                NextView()
+            })
             .navigationTitle("Network Monitor")
         }
         .sheet(isPresented: .constant(!(isConnected ?? true))) {
